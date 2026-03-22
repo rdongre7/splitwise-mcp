@@ -7,6 +7,7 @@ from urllib.parse import urlencode, urlparse
 import httpx
 import uvicorn
 from pydantic import AnyHttpUrl
+from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 from starlette.responses import HTMLResponse, RedirectResponse, Response
 from starlette.types import ASGIApp, Receive, Scope, Send
@@ -466,7 +467,13 @@ def main() -> None:
     #   POST /register     — dynamic client registration (Claude.ai uses this)
     #   GET  /auth/callback — our custom route; handles Splitwise redirect
     starlette_app = mcp.streamable_http_app()
-    wrapped = SplitwiseTokenMiddleware(starlette_app, provider)
+    with_token = SplitwiseTokenMiddleware(starlette_app, provider)
+    wrapped = CORSMiddleware(
+        with_token,
+        allow_origins=["https://claude.ai"],
+        allow_methods=["*"],
+        allow_headers=["Authorization", "Content-Type", "mcp-protocol-version", "mcp-session-id"],
+    )
     uvicorn.run(wrapped, host=HOST, port=PORT)
 
 
