@@ -2,7 +2,7 @@ import os
 import secrets
 import time
 from contextvars import ContextVar
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlparse
 
 import httpx
 import uvicorn
@@ -21,6 +21,7 @@ from mcp.server.auth.provider import (
 )
 from mcp.server.auth.settings import AuthSettings, ClientRegistrationOptions
 from mcp.server.fastmcp import FastMCP as MCPServer
+from mcp.server.transport_security import TransportSecuritySettings
 from mcp.shared.auth import OAuthClientInformationFull, OAuthToken
 
 # ---------------------------------------------------------------------------
@@ -39,6 +40,7 @@ HOST = os.environ.get("HOST", "0.0.0.0")
 PORT = int(os.environ.get("PORT", "8000"))
 
 SPLITWISE_CALLBACK_URL = f"{SERVER_URL}/auth/callback"
+SERVER_HOST = urlparse(SERVER_URL).netloc  # e.g. "web-production-22fff.up.railway.app"
 
 # ContextVar lets the ASGI middleware pass each user's Splitwise token
 # into synchronous tool handlers without threading issues.
@@ -264,6 +266,9 @@ mcp = MCPServer(
         ),
         required_scopes=["splitwise"],
         resource_server_url=None,  # Combined AS + RS (legacy mode)
+    ),
+    transport_security=TransportSecuritySettings(
+        allowed_hosts=[SERVER_HOST, "localhost", "127.0.0.1"],
     ),
 )
 
