@@ -20,7 +20,7 @@ from mcp.server.auth.provider import (
     construct_redirect_uri,
 )
 from mcp.server.auth.settings import AuthSettings, ClientRegistrationOptions
-from mcp.server.mcpserver import MCPServer
+from mcp.server.fastmcp import FastMCP as MCPServer
 from mcp.shared.auth import OAuthClientInformationFull, OAuthToken
 
 # ---------------------------------------------------------------------------
@@ -460,7 +460,7 @@ def main() -> None:
     #   POST /token        — exchange auth code for access token
     #   POST /register     — dynamic client registration (Claude.ai uses this)
     #   GET  /auth/callback — our custom route; handles Splitwise redirect
-    starlette_app = mcp.streamable_http_app(host=HOST)
+    starlette_app = mcp.streamable_http_app()
     wrapped = SplitwiseTokenMiddleware(starlette_app, provider)
     uvicorn.run(wrapped, host=HOST, port=PORT)
 
