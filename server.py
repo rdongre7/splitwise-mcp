@@ -22,6 +22,7 @@ from mcp.server.auth.provider import (
 )
 from mcp.server.auth.settings import AuthSettings, ClientRegistrationOptions
 from mcp.server.fastmcp import FastMCP as MCPServer
+from mcp.types import Icon
 from mcp.server.transport_security import TransportSecuritySettings
 from mcp.shared.auth import OAuthClientInformationFull, OAuthToken
 
@@ -257,6 +258,7 @@ provider = SplitwiseOAuthProvider()
 
 mcp = MCPServer(
     name="splitwise",
+    icons=[Icon(src="https://secure.splitwise.com/apple-touch-icon.png", mimeType="image/png")],
     auth_server_provider=provider,
     auth=AuthSettings(
         issuer_url=AnyHttpUrl(SERVER_URL),
